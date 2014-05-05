@@ -10,11 +10,58 @@ the workshop. It's job is to convert strings into data structures that the evalu
 understand. 
 """
 
+
+def clean_boundary_paren(source):
+    new_source = re.sub(r"^\((.*)\)$", r'\1', source.strip())
+    return new_source, source == new_source
+
+
+def clean_newline_spaces(source):
+    return re.sub(r'[ \n]+', ' ', source)
+
+
+def expression(exp):
+    # TODO: to real expression in Python
+    # like #f to False, #t to True
+    # '1' to 1
+    # '"1"' to "1"
+    directMapping = {
+        "#f": False,
+        "#t": True,
+    }
+
+    if exp in directMapping:
+        return directMapping[exp]
+    if re.match(r"^'", exp):
+        return ["quote", expression(exp[1:])]
+    elif re.match(r'^\d+$', exp):
+        return int(exp)
+    elif re.match(r'^\d+\.\d+$', exp):
+        return float(exp)
+    else:
+        return exp
+
+
 def parse(source):
     """Parse string representation of one *single* expression
     into the corresponding Abstract Syntax Tree."""
 
-    raise NotImplementedError("DIY")
+    source = remove_comments(source)
+    source = clean_newline_spaces(source).strip()
+
+    return recursive_parse(source)
+
+
+def recursive_parse(source):
+    source, isterminal = clean_boundary_paren(source.strip())
+
+    if isterminal:
+        return expression(source)
+    
+    exps = split_exps(source)
+
+    return map(recursive_parse, exps)
+
 
 ##
 ## Below are a few useful utility functions. These should come in handy when 
