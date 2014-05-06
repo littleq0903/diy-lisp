@@ -32,8 +32,6 @@ def expression(exp):
 
     if exp in directMapping:
         return directMapping[exp]
-    if re.match(r"^'", exp):
-        return ["quote", expression(exp[1:])]
     elif re.match(r'^\d+$', exp):
         return int(exp)
     elif re.match(r'^\d+\.\d+$', exp):
@@ -53,11 +51,21 @@ def parse(source):
 
 
 def recursive_parse(source):
+    if source[0] == "'":
+        return ["quote", recursive_parse(source[1:])]
+    elif source[0] == "(":
+        end = find_matching_paren(source)
+
+        if end + 1 < len(source):
+            raise LispError("Expected EOF: %s" % source)
+        if end + 1 > len(source):
+            raise LispError("Incomplete expression: %s" % source)
+
     source, isterminal = clean_boundary_paren(source.strip())
 
     if isterminal:
         return expression(source)
-    
+
     exps = split_exps(source)
 
     return map(recursive_parse, exps)
