@@ -21,10 +21,6 @@ def clean_newline_spaces(source):
 
 
 def expression(exp):
-    # TODO: to real expression in Python
-    # like #f to False, #t to True
-    # '1' to 1
-    # '"1"' to "1"
     directMapping = {
         "#f": False,
         "#t": True,
@@ -66,9 +62,7 @@ def recursive_parse(source):
     if isterminal:
         return expression(source)
 
-    exps = split_exps(source)
-
-    return map(recursive_parse, exps)
+    return map(recursive_parse, split_exps(source))
 
 
 ##
