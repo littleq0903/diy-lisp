@@ -5,6 +5,8 @@ from ast import is_boolean, is_atom, is_symbol, is_list, is_closure, is_integer
 from asserts import assert_exp_length, assert_valid_definition, assert_boolean
 from parser import unparse
 
+import re
+
 """
 This is the Evaluator module. The `evaluate` function below is the heart
 of your language, and the focus for most of parts 2 through 6.
@@ -14,6 +16,26 @@ making your work a bit easier. (We're supposed to get through this thing
 in a day, after all.)
 """
 
+
 def evaluate(ast, env):
     """Evaluate an Abstract Syntax Tree in the specified environment."""
-    raise NotImplementedError("DIY")
+    op = ast[0]
+    args = ast[1:]
+
+    if op == "quote":
+        return args
+
+    if op == "atom":
+        return True if re.match("^[^\"\'].*[\"\']$", args[0]) else False
+
+    if op == "+":
+        return args[0] + args[1]
+    elif op == "-":
+        return args[0] - args[1]
+    elif op == "*":
+        return args[0] * args[1]
+    elif op == "/":
+        return args[0] / args[1]
+
+    if op == "eq":
+        return args[0] == args[1]
